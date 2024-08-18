@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response } from "express";
 import { Knex } from "knex";
 
 export const mountSignupRouter = (knexSql: Knex) => {

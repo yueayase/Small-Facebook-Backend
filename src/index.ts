@@ -1,6 +1,7 @@
 
 import express, { Application } from "express";
 import cors, { CorsOptions } from "cors";
+import dotenv from "dotenv";
 import { Knex, knex } from "knex";
 import { mountUserRouter } from "./routes/user";
 
@@ -12,8 +13,8 @@ export default class App {
   constructor(port: number) {
     this.app = express();
     this.PORT = port;
-    this.initialDatabase();
     this.config();
+    this.initialDatabase();
     this.routerSetup();
   }
 
@@ -23,6 +24,7 @@ export default class App {
     };
 
     this.app.use(cors(corsOptions));
+    dotenv.config();
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
@@ -40,7 +42,6 @@ export default class App {
         database: process.env.DATABASE_DATABASE || "MyFacebookDatabase"
        }
     });
-
 
   }
 
