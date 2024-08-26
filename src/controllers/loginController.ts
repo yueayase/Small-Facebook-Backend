@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 export const mountLoginRouter = (knexSql: Knex) => {
     const loginController = async(req: Request, res: Response) =>  {
-        const { cellPhoneOrEmailText, password } = req.body;
+        const { cellPhoneOrEmailText, password: userInputPassword } = req.body;
         let userInfo; // for user information stored in the database
 
         try{
@@ -54,7 +54,7 @@ export const mountLoginRouter = (knexSql: Knex) => {
             }
             
             // inconsistent password
-            if (userInfo[0].password !== password) {
+            if (userInfo[0].password !== userInputPassword) {
                 res.status(401).json({ message: "Invalid password!"});
                 return;
             }
@@ -69,7 +69,7 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
             );
 
-            const {id, ...toSendInfo} = userInfo[0]; // split out id
+            const {password, ...toSendInfo} = userInfo[0]; // split out id
             
             // send all of the user information
             res.status(200).json({...toSendInfo, accessToken: token});
