@@ -23,10 +23,11 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
 
                 userInfo = await knexSql
-                    .select("id", "name", "email", "cellPhoneNumber", "password", 
+                    .select("id", "name", "email", "cellPhoneNumber", "password", "url", 
                             knexSql.raw("DATE_FORMAT(birthday, '%Y-%m-%d') as birthday"), 
                             "gender", "genderAlias")
                     .from("User")
+                    .join("UserUrl", "User.id", "=", "UserUrl.userId")
                     .join("UserCellPhone", "User.id", "=", "UserCellPhone.userId")
                     .leftJoin("UserEmail", "User.id", "=", "UserEmail.userId")
                     .where("User.id", userCellPhone[0].userId);
@@ -44,10 +45,11 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
 
                 userInfo = await knexSql
-                    .select("id", "name", "email", "cellPhoneNumber", "password", 
+                    .select("id", "name", "email", "cellPhoneNumber", "password", "url",
                             knexSql.raw("DATE_FORMAT(birthday, '%Y-%m-%d') as birthday"), 
                             "gender", "genderAlias")
                     .from("User")
+                    .join("UserUrl", "User.id", "=", "UserUrl.userId")
                     .join("UserEmail", "User.id", "=","UserEmail.userId")
                     .leftJoin("UserCellPhone", "User.id", "=", "UserCellPhone.userId")
                     .where("User.id", userEmail[0].userId);
@@ -72,7 +74,7 @@ export const mountLoginRouter = (knexSql: Knex) => {
             const {password, ...toSendInfo} = userInfo[0]; // split out id
             
             // send all of the user information
-            res.status(200).json({...toSendInfo, accessToken: token});
+            res.status(200).json({ ...toSendInfo, accessToken: token });
         }
         catch(error) {
             res.status(500).json({ error: error });
