@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import { Knex, knex } from "knex";
 import { mountUserRouter } from "./routes/user";
 
+const path = require("path");
+
 export default class App {
   private app: Application;
   private PORT: number;
@@ -27,7 +29,7 @@ export default class App {
     dotenv.config();
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-
+    this.app.use("/Users", express.static(path.join(__dirname, "Users")));
   }
 
   private initialDatabase(): void {

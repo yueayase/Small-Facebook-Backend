@@ -23,13 +23,10 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
 
                 userInfo = await knexSql
-                    .select("id", "name", "email", "cellPhoneNumber", "password", "url", 
-                            knexSql.raw("DATE_FORMAT(birthday, '%Y-%m-%d') as birthday"), 
-                            "gender", "genderAlias")
+                    .select("id", "name", "password", "url", "genderAlias")
                     .from("User")
                     .join("UserUrl", "User.id", "=", "UserUrl.userId")
                     .join("UserCellPhone", "User.id", "=", "UserCellPhone.userId")
-                    .leftJoin("UserEmail", "User.id", "=", "UserEmail.userId")
                     .where("User.id", userCellPhone[0].userId);
             }
             else {
@@ -40,18 +37,15 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 
                 // the email has not been registered
                 if (userEmail.length === 0) {
-                    res.status(404).json({ error: `can't find email: ${cellPhoneOrEmailText}!` });
+                    res.status(404).json({ message: `can't find email: ${cellPhoneOrEmailText}!` });
                     return;
                 }
 
                 userInfo = await knexSql
-                    .select("id", "name", "email", "cellPhoneNumber", "password", "url",
-                            knexSql.raw("DATE_FORMAT(birthday, '%Y-%m-%d') as birthday"), 
-                            "gender", "genderAlias")
+                    .select("id", "name", "password", "url", "genderAlias")
                     .from("User")
                     .join("UserUrl", "User.id", "=", "UserUrl.userId")
                     .join("UserEmail", "User.id", "=","UserEmail.userId")
-                    .leftJoin("UserCellPhone", "User.id", "=", "UserCellPhone.userId")
                     .where("User.id", userEmail[0].userId);
             }
             
@@ -71,7 +65,7 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
             );
 
-            const {password, ...toSendInfo} = userInfo[0]; // split out id
+            const {password, ...toSendInfo} = userInfo[0]; // split out password
             
             // send all of the user information
             res.status(200).json({ ...toSendInfo, accessToken: token });

@@ -5,7 +5,9 @@ CREATE TABLE IF NOT exists `User` (
     `password` VARCHAR(40) NOT NULL,
     `birthday` DATE NOT NULL,
     `gender` VARCHAR(100) NOT NULL,
-    `genderAlias` VARCHAR(10) NOT NULL
+    `genderAlias` VARCHAR(10) NOT NULL,
+    `coverImage` varchar(255) DEFAULT '',
+    `userIcon` varchar(255) DEFAULT ''
 );
 CREATE TABLE IF NOT exists `UserEmail` (
     `userId` BIGINT UNSIGNED PRIMARY KEY,
