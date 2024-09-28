@@ -5,6 +5,7 @@ import { mountSignupRouter } from "../controllers/signupController";
 import { mountLoginRouter } from "../controllers/loginController";
 import { mountGetUserProfileController } from "../controllers/getUserProfileController";
 import { mountUploadCoverImageMiddleware } from "../middlewares/uploadCoverImageMiddleware";
+import { mountUploadUserIconMiddleware } from "../middlewares/uploadUserIconMiddleware";
 
 export const mountUserRouter = (knexSql: Knex) => {
     let router = Router();
@@ -17,6 +18,11 @@ export const mountUserRouter = (knexSql: Knex) => {
         (req: Request, res: Response) => {
             res.status(200).json({ message: "Cover image uploaded successfully." });
     
+    });
+    router.post("/upload/user_icon",
+        mountUploadUserIconMiddleware(knexSql),
+        (req: Request, res: Response) => {
+            res.status(200).json({ message: "User icon uploaded successfully." });
     });
 
     return router;

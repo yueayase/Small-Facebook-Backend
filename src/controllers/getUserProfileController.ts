@@ -23,6 +23,16 @@ export const mountGetUserProfileController = (knexSql: Knex) => {
             let toSendUserData: { [key: string] : any } = {name: name};
 
             if (coverImage.length === 0) {
+                toSendUserData["coverImage"] = '';
+            }
+            else {
+                const baseDir = path.resolve(__dirname, '../Users');
+                const imagePath = path.join(baseDir, url, "photo", coverImage);
+                const image = fs.readFileSync(imagePath, { encoding: "base64" }); 
+                toSendUserData["coverImage"] = `data:image/jpeg;base64,${image}`;
+            }
+
+            if (userIcon.length === 0) {
                 const baseDir = path.resolve(__dirname, '../DefaultUserIcons');
                 let imageName = "";
                 if (genderAlias === "1")
@@ -34,17 +44,7 @@ export const mountGetUserProfileController = (knexSql: Knex) => {
 
                 const imagePath = path.join(baseDir, imageName);
                 const image = fs.readFileSync(imagePath, { encoding: "base64" });
-                toSendUserData["coverImage"] = `data:image/jpeg;base64,${image}`;
-            }
-            else {
-                const baseDir = path.resolve(__dirname, '../Users');
-                const imagePath = path.join(baseDir, url, "photo", coverImage);
-                const image = fs.readFileSync(imagePath, { encoding: "base64" }); 
-                toSendUserData["coverImage"] = `data:image/jpeg;base64,${image}`;
-            }
-
-            if (userIcon.length === 0) {
-                toSendUserData["userIcon"] = '';
+                toSendUserData["userIcon"] = `data:image/jpeg;base64,${image}`;
             }
             else {
                 const baseDir = path.resolve(__dirname, '../Users');

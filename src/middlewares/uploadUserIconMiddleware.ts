@@ -13,7 +13,7 @@ interface MulterRequest extends Request {
 // Adjust the base directory to point to the root of your project
 const baseDir = path.resolve(__dirname, '../Users');
 
-export const mountUploadCoverImageMiddleware = (knexSql: Knex) => {
+export const mountUploadUserIconMiddleware = (knexSql: Knex) => {
     const storage = multer.diskStorage({
         destination: (
             req: Request, 
@@ -33,40 +33,39 @@ export const mountUploadCoverImageMiddleware = (knexSql: Knex) => {
         } 
     });
 
-    const upload = multer({ storage: storage }).single("cover_image");
+    const upload = multer({ storage: storage }).single("user_icon");
 
-
-    const uploadCoverImageMiddleware = async (req: Request, res: Response) => {
+    const uploadUserIconMiddleware = async (req: Request, res: Response) => {
         upload(req, res, async (error: any) => {
             if (error)
-                return res.status(500).json({ error: `uploading cover image failed due to ${error}` });
+                return res.status(500).json({ error: `uploading user icon failed due to ${error}` });
 
             try {
                 const userUrl = req.body.userUrl;
                 const filename = req.file?.filename;
 
                 if (!filename || filename.length === 0)
-                    return res.status(400).json({ error: "you didn't upload the cover image." });
+                    return res.status(400).json({ error: "you didn't upload the user icon." });
 
-                console.log("test upload cover image file");
+                console.log("test upload user icon file");
 
                 await knexSql.transaction(async (trx: Knex.Transaction) => {
                     await trx("User")
-                        .update({ coverImage: filename })
-                        .where({ 
+                        .update({ userIcon: filename })
+                        .where({
                             id: trx.select("userId")
-                                .from("UserUrl")
-                                .where("url", userUrl)
+                               .from("UserUrl")
+                               .where("url", userUrl)
                         }
                     );
-                });
 
-                return res.status(200).json({ message: `successfully upload the cover image.` });
+                    return res.status(200).json({ message: `successfully upload the user icon.` });
+                });
             }
             catch (dbError) {
                 const userUrl  = req.body.userUrl;
                 const filename = req.file?.filename;
-                
+
                 if (filename && filename.length > 0) {
                     const user_dir = path.join(__dirname, "Users", userUrl, "photo", filename);
                     fs.unlink(user_dir, (fsError) => {
@@ -81,5 +80,5 @@ export const mountUploadCoverImageMiddleware = (knexSql: Knex) => {
         });
     };
 
-    return uploadCoverImageMiddleware;
+    return uploadUserIconMiddleware;
 };
