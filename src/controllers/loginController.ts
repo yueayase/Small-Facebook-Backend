@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { Knex } from "knex";
+import retrieveCoverImage from "../utils/retrieveCoverImage";
+import retrieveUserIcon from "../utils/retrieveUserIcon";
 
 const jwt = require("jsonwebtoken");
 
@@ -23,7 +25,7 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
 
                 userInfo = await knexSql
-                    .select("id", "name", "password", "url", "genderAlias")
+                    .select("id", "name", "password", "url", "genderAlias", "coverImage", "userIcon")
                     .from("User")
                     .join("UserUrl", "User.id", "=", "UserUrl.userId")
                     .join("UserCellPhone", "User.id", "=", "UserCellPhone.userId")
@@ -42,7 +44,7 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
 
                 userInfo = await knexSql
-                    .select("id", "name", "password", "url", "genderAlias")
+                    .select("id", "name", "password", "url", "genderAlias", "coverImage", "userIcon")
                     .from("User")
                     .join("UserUrl", "User.id", "=", "UserUrl.userId")
                     .join("UserEmail", "User.id", "=","UserEmail.userId")
@@ -65,7 +67,10 @@ export const mountLoginRouter = (knexSql: Knex) => {
                 }
             );
 
-            const {password, ...toSendInfo} = userInfo[0]; // split out password
+            const { password, ...toSendInfo } = userInfo[0]; // split out password
+            const { coverImage, userIcon, genderAlias, url } = toSendInfo;
+            toSendInfo["coverImage"] = retrieveCoverImage(coverImage, url);
+            toSendInfo["userIcon"] = retrieveUserIcon(userIcon, genderAlias, url);
             
             // send all of the user information
             res.status(200).json({ ...toSendInfo, accessToken: token });
