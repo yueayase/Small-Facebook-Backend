@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { Knex } from "knex";
+import path from "path";
+import fs from "fs";
 
 export const mountSignupRouter = (knexSql: Knex) => {
     const signupController = async (req: Request, res: Response) => {
@@ -52,10 +54,21 @@ export const mountSignupRouter = (knexSql: Knex) => {
                 }
 
                 await trx("UserUrl").insert({ userId: userId, url: your_url });
+
+                // Create the folder for the new user to place their photos and videos
+                const userFolder = path.join(__dirname, "../Users", your_url);
+                const photoDir = path.join(userFolder, "photo");
+                const videoDir = path.join(userFolder, "video");
+
+                if (!fs.existsSync(userFolder)) {
+                    fs.mkdirSync(userFolder);
+                    fs.mkdirSync(photoDir);
+                    fs.mkdirSync(videoDir);
+                    console.log(`successfully created a folder for the user with url: ${your_url}`);
+                }
             });
 
             res.status(200).json({ message: `successfully insert user ${name}`});
-
         }
         catch(error) {
             console.log(error);
